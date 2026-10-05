@@ -1,0 +1,16 @@
+# Your private copy of the Excel workbook stays on your computer (see data/source/README.md)
+data/source/*.xlsx
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/

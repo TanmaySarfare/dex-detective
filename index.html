@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dex Detective</title>
+<meta name="description" content="Three Pokémon guessing games built from a dataset of all 1,025 Pokémon: a daily mystery, Stat Shadow and Higher or Lower.">
+<meta property="og:title" content="Dex Detective">
+<meta property="og:description" content="Crack the daily mystery Pokémon, name one from its stat shape, or keep a higher-or-lower streak going.">
+<meta name="theme-color" content="#E4ECDD" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121A15" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Pixelify+Sans:wght@500;700&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="logo"><svg class="mag" id="mag" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true"></svg>Dex Detective</h1>
+    <p class="lede">Three guessing games built from all 1,025 Pokémon. Crack the daily mystery, name a Pokémon from its stat shape, or see how long a higher-or-lower streak you can keep going.</p>
+    <div class="controls">
+      <div class="tabs" role="tablist" aria-label="Games">
+        <button role="tab" id="t-mystery" data-tab="mystery" aria-controls="mystery" aria-selected="true">Mystery Pokémon</button>
+        <button role="tab" id="t-shadow" data-tab="shadow" aria-controls="shadow" aria-selected="false" tabindex="-1">Stat Shadow</button>
+        <button role="tab" id="t-hilo" data-tab="hilo" aria-controls="hilo" aria-selected="false" tabindex="-1">Higher or Lower</button>
+      </div>
+      <label class="gen">Pokémon from
+        <select id="genSel">
+          <option value="">All generations</option>
+          <option value="1">Gen 1: Kanto</option><option value="2">Gen 2: Johto</option><option value="3">Gen 3: Hoenn</option>
+          <option value="4">Gen 4: Sinnoh</option><option value="5">Gen 5: Unova</option><option value="6">Gen 6: Kalos</option>
+          <option value="7">Gen 7: Alola</option><option value="8">Gen 8: Galar</option><option value="9">Gen 9: Paldea</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <noscript><p class="status">Dex Detective needs JavaScript turned on to play.</p></noscript>
+    <section id="mystery" class="panel" role="tabpanel" aria-labelledby="t-mystery">
+      <div class="panel-head">
+        <h2>Mystery Pokémon</h2>
+        <div class="seg" role="group" aria-label="Puzzle type">
+          <button type="button" id="mDaily" aria-pressed="true">Daily</button>
+          <button type="button" id="mPractice" aria-pressed="false">Practice</button>
+        </div>
+      </div>
+      <p class="how">Find the hidden Pokémon in 8 guesses. Each guess is compared with the answer, and the arrows tell you whether the answer's number is higher or lower. Practice rounds use the generation you pick above; the daily puzzle uses all of them.</p>
+      <div class="guess">
+        <div class="combo">
+          <input id="mInput" type="text" disabled placeholder="Type a Pokémon name" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="mList" aria-label="Pokémon name">
+          <ul id="mList" class="list" role="listbox" hidden></ul>
+        </div>
+        <button class="btn" id="mGo" type="button" disabled>Guess</button>
+      </div>
+      <p class="status" id="mStatus" aria-live="polite">Loading Pokémon…</p>
+      <div class="board-scroll">
+        <table class="board">
+          <thead><tr><th scope="col">Pokémon</th><th scope="col">Gen</th><th scope="col">Type 1</th><th scope="col">Type 2</th><th scope="col">Height</th><th scope="col">Weight</th><th scope="col">Base total</th></tr></thead>
+          <tbody id="mBody"></tbody>
+        </table>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw hit"></i>Exact match</span>
+        <span><i class="sw near"></i>Close, or the right type in the other slot</span>
+        <span><i class="sw miss"></i>Not close</span>
+      </div>
+      <div class="result" id="mResult" hidden></div>
+    </section>
+
+    <section id="shadow" class="panel" role="tabpanel" aria-labelledby="t-shadow" hidden>
+      <div class="panel-head">
+        <h2>Stat Shadow</h2>
+        <div class="score"><span>Streak<b id="sStreak">0</b></span><span>Best<b id="sBest">0</b></span></div>
+      </div>
+      <p class="how">This shape is a Pokémon's six base stats. Name it in 6 guesses. Every miss unlocks a new clue and draws your guess's shape on top, so you can see how close you were.</p>
+      <div class="shadow-grid">
+        <figure class="radar-fig">
+          <svg id="radar" viewBox="0 0 340 300" role="img" aria-label="Base stats of the mystery Pokémon"></svg>
+          <figcaption><span><i class="key k-shape"></i>Mystery Pokémon</span><span id="sLegendGuess" hidden><i class="key k-ghost"></i>Your last guess, <b></b></span></figcaption>
+        </figure>
+        <div class="clues"><h3>Clues</h3><ol id="sClues"></ol></div>
+      </div>
+      <div class="guess">
+        <div class="combo">
+          <input id="sInput" type="text" disabled placeholder="Type a Pokémon name" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sList" aria-label="Pokémon name">
+          <ul id="sList" class="list" role="listbox" hidden></ul>
+        </div>
+        <button class="btn" id="sGo" type="button" disabled>Guess</button>
+      </div>
+      <p class="status" id="sStatus" aria-live="polite"></p>
+      <ul class="chips" id="sChips" aria-label="Your guesses"></ul>
+      <div class="result" id="sResult" hidden></div>
+    </section>
+
+    <section id="hilo" class="panel" role="tabpanel" aria-labelledby="t-hilo" hidden>
+      <div class="panel-head">
+        <h2>Higher or Lower</h2>
+        <div class="score"><span>Streak<b id="hStreak">0</b></span><span>Best<b id="hBest">0</b></span></div>
+      </div>
+      <p class="question" id="hQ" aria-live="polite"></p>
+      <div class="duel">
+        <article class="card" id="hA"></article>
+        <span class="vs" aria-hidden="true">vs</span>
+        <article class="card" id="hB"></article>
+      </div>
+      <div class="hl-btns">
+        <button class="btn big" type="button" id="hUp" disabled>▲ Higher</button>
+        <button class="btn big" type="button" id="hDown" disabled>▼ Lower</button>
+      </div>
+      <p class="hint">You can also press the up and down arrow keys. Ties count as correct.</p>
+      <div class="result" id="hOver" hidden></div>
+    </section>
+  </main>
+
+  <footer class="foot">A fan-made project, not affiliated with Nintendo, Game Freak or The Pokémon Company. Pokémon and Pokémon character names are trademarks of Nintendo.</footer>
+</div>
+<div class="toast-wrap"><div class="toast" id="toast" role="status" aria-live="polite"></div></div>
+
+<script>
+  // Browsers block JavaScript modules on pages opened straight from disk (file://), so explain how to run it.
+  if (location.protocol === 'file:') {
+    document.getElementById('mStatus').textContent = 'This page needs a local web server. In a terminal, go to this folder, ' +
+      'run "python3 -m http.server", then open http://localhost:8000 (see the README).';
+  }
+</script>
+</body>
+</html>

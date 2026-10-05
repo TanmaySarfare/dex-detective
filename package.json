@@ -1,0 +1,14 @@
+{
+  "name": "dex-detective",
+  "version": "1.0.0",
+  "description": "Three Pokémon guessing games built from a dataset of all 1,025 Pokémon.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
